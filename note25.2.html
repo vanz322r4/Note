@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Note</title>
+  <style>
+    body {
+      font-family: Tahoma, Arial, sans-serif;
+      background-color: #e6e9ed;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      font-size: 12px;
+    }
+
+    .wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Левое меню (как в ВК) */
+    .sidebar {
+      width: 110px;
+      background: #d6e1f3;
+      border-right: 1px solid #c5cfd8;
+      padding: 10px 0;
+      text-align: center;
+    }
+    .sidebar-icon {
+      width: 44px;
+      height: 44px;
+      margin: 10px auto;
+      background: #a6b6cd;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .sidebar-icon:hover { opacity: 0.8; }
+    .sidebar-label {
+      font-size: 10px;
+      color: #4c5c78;
+      margin-top: 4px;
+    }
+
+    /* Основной контент */
+    .main-content {
+      flex: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      background: white;
+      min-height: 100vh;
+    }
+
+    /* Шапка */
+    header {
+      background: #4c75a3;
+      color: white;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      font-size: 18px;
+      font-weight: normal;
+    }
+    .header-links a {
+      color: white;
+      margin-left: 15px;
+      text-decoration: none;
+      font-size: 12px;
+    }
+    .header-links a:hover { text-decoration: underline; }
+
+    /* Профиль в шапке */
+    .profile-bar {
+      padding: 10px 15px;
+      background: #f0f2f5;
+      border-bottom: 1px solid #e2e2e2;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .profile-bar img {
+      width: 32px;
+      height: 32px;
+      border-radius: 2px;
+    }
+    .profile-name {
+      font-weight: bold;
+      color: #333;
+    }
+    .profile-status {
+      font-size: 11px;
+      color: #666;
+    }
+
+    /* Контент */
+    .content {
+      display: flex;
+      padding: 15px;
+      gap: 15px;
+    }
+    .feed {
+      flex: 1;
+      max-width: 600px;
+    }
+    .right-column {
+      width: 280px;
+      font-size: 11px;
+    }
+
+    /* Экраны */
+    .screen {
+      display: none;
+    }
+    .screen.active {
+      display: block;
+    }
+
+    /* Профиль */
+    .profile-card {
+      background: white;
+      border: 1px solid #e2e2e2;
+      padding: 10px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .profile-card img {
+      width: 100px;
+      height: 100px;
+      border-radius: 2px;
+      object-fit: cover;
+      border: 1px solid #ddd;
+    }
+    .profile-card h2 {
+      margin: 10px 0 5px 0;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .profile-card p {
+      margin: 5px 0;
+      color: #666;
+      font-size: 11px;
+    }
+
+    .profile-menu {
+      display: flex;
+      border-bottom: 1px solid #e2e2e2;
+      margin-bottom: 15px;
+    }
+    .profile-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: bold;
+      color: #666;
+    }
+    .profile-tab.active {
+      color: #4c75a3;
+      border-bottom: 2px solid #4c75a3;
+    }
+
+    /* Форма поста */
+    .create-post {
+      background: white;
+      border: 1px solid #e2e2e2;
+      padding: 10px;
+      margin-bottom: 15px;
+    }
+    .create-post textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 2px;
+      resize: none;
+      height: 40px;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .create-post input[type=file] {
+      font-size: 11px;
+      margin: 5px 0;
+    }
+    .create-post button {
+      padding: 5px 10px;
+      background: #4c75a3;
+      color: white;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    /* Пост */
+    .post {
+      background: white;
+      border: 1px solid #e2e2e2;
+      margin-bottom: 15px;
+    }
+    .post-header {
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #e2e2e2;
+    }
+    .post-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 2px;
+      background: #4c75a3;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .post-name {
+      font-weight: bold;
+      color: #333;
+    }
+    .post-text {
+      padding: 10px;
+      line-height: 1.5;
+    }
+    .post-image {
+      width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+      border-top: 1px solid #e2e2e2;
+      border-bottom: 1px solid #e2e2e2;
+    }
+    .post-actions {
+      display: flex;
+      border-top: 1px solid #e2e2e2;
+    }
+    .action-btn {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      color: #666;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .action-btn:hover { background: #f0f2f5; }
+    .action-btn.like.active { color: #ff3b30; }
+
+    /* Комментарии */
+    .comments {
+      border-top: 1px dashed #e2e2e2;
+      padding: 10px;
+    }
+    .comment {
+      display: flex;
+      margin-bottom: 8px;
+      font-size: 11px;
+    }
+    .comment-avatar {
+      width: 24px;
+      height: 24px;
+      background: #4c75a3;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 8px;
+      border-radius: 2px;
+    }
+    .comment-content {
+      background: #f0f2f5;
+      padding: 4px 8px;
+      border-radius: 2px;
+    }
+    .add-comment {
+      display: flex;
+      margin-top: 8px;
+    }
+    .add-comment input {
+      flex: 1;
+      padding: 4px 8px;
+      border: 1px solid #ddd;
+      border-radius: 2px;
+      font-size: 11px;
+    }
+    .add-comment button {
+      padding: 4px 8px;
+      background: #4c75a3;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
+      margin-left: 5px;
+    }
+
+    /* Чаты */
+    .chat-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+    }
+    .chat-item:hover { background: #f0f2f5; }
+    .chat-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 2px;
+      background: #a6b6cd;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+    .chat-name {
+      font-size: 13px;
+    }
+
+    /* Сообщения */
+    .messages {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #fafafa;
+    }
+    .msg {
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border-radius: 2px;
+      max-width: 80%;
+      font-size: 12px;
+    }
+    .msg-self {
+      background: #4c75a3;
+      color: white;
+      margin-left: auto;
+    }
+    .msg-other {
+      background: #e9ebee;
+      color: black;
+      margin-right: auto;
+    }
+    .chat-input {
+      display: flex;
+      gap: 10px;
+    }
+    .chat-input input {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 2px;
+      font-size: 12px;
+    }
+    .chat-input button {
+      padding: 8px 12px;
+      background: #4c75a3;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* Группы */
+    .group-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+    }
+    .group-item:hover { background: #f0f2f5; }
+    .group-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 2px;
+      background: #a6b6cd;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+    .group-name {
+      font-size: 13px;
+    }
+
+    /* Настройки */
+    .settings-field {
+      display: block;
+      margin: 10px 0;
+    }
+    .settings-field label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .settings-field input {
+      width: 100%;
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 2px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+
+    <!-- Левое меню -->
+    <div class="sidebar">
+      <div class="sidebar-icon" onclick="showSection('profile')">N</div>
+      <div class="sidebar-label">Note</div>
+
+      <div class="sidebar-icon" onclick="showSection('profile')">🏠</div>
+      <div class="sidebar-label">Моя страница</div>
+
+      <div class="sidebar-icon" onclick="showSection('friends')">👥</div>
+      <div class="sidebar-label">Друзья</div>
+
+      <div class="sidebar-icon" onclick="showSection('chats')">💬</div>
+      <div class="sidebar-label">Сообщения</div>
+
+      <div class="sidebar-icon" onclick="showSection('groups')">📌</div>
+      <div class="sidebar-label">Группы</div>
+
+      <div class="sidebar-icon" onclick="showSection('settings')">⚙️</div>
+      <div class="sidebar-label">Настройки</div>
+
+      <div class="sidebar-icon" onclick="logout()">🚪</div>
+      <div class="sidebar-label">Выход</div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="main-content">
+
+      <!-- Шапка -->
+      <header>
+        <h1>Note</h1>
+        <div class="header-links">
+          <a href="#" onclick="showSection('profile')">Моя страница</a>
+          <a href="#" onclick="showSection('chats')">Сообщения</a>
+          <a href="#" onclick="showSection('groups')">Группы</a>
+          <a href="#" onclick="logout()">Выход</a>
+        </div>
+      </header>
+
+      <!-- Профиль -->
+      <div class="profile-bar">
+        <img id="navAvatar" src="https://via.placeholder.com/32" alt="Ава">
+        <div>
+          <div class="profile-name" id="welcomeName">Загрузка...</div>
+          <div class="profile-status" id="userStatus">Онлайн</div>
+        </div>
+      </div>
+
+      <!-- Контент -->
+      <div class="content">
+
+        <!-- Центральная зона -->
+        <div class="feed">
+
+          <!-- Профиль -->
+          <div id="profile" class="screen active">
+            <div class="profile-card">
+              <img id="profileAvatar" src="https://via.placeholder.com/100" alt="Аватар">
+              <h2 id="profileName">Имя Фамилия</h2>
+              <p id="profileStatus">Статус</p>
+            </div>
+            <div class="profile-menu">
+              <div class="profile-tab active">Стена</div>
+            </div>
+            <div class="create-post">
+              <textarea id="postText" placeholder="Напишите что-нибудь..."></textarea>
+              <input type="file" id="postImage" accept="image/*">
+              <button onclick="addPost()">Опубликовать</button>
+            </div>
+            <div id="postsContainer"></div>
+          </div>
+
+          <!-- Друзья -->
+          <div id="friends" class="screen">
+            <h2>Друзья</h2>
+            <div id="friendsList"></div>
+          </div>
+
+          <!-- Чаты -->
+          <div id="chats" class="screen">
+            <h2>Чаты</h2>
+            <div id="chatsList"></div>
+
+            <div id="chatBox" style="display:none; margin-top:15px;">
+              <div class="messages" id="messageList"></div>
+              <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Сообщение..." onkeypress="if(event.key==='Enter')sendMessage()">
+                <button onclick="sendMessage()">Отправить</button>
+              </div>
+              <button class="btn" style="margin-top:10px;" onclick="hideChat()">Назад</button>
+            </div>
+          </div>
+
+          <!-- Группы -->
+          <div id="groups" class="screen">
+            <h2>Группы</h2>
+            <div class="create-post">
+              <input type="text" id="groupName" placeholder="Название группы">
+              <button onclick="createGroup()">Создать</button>
+            </div>
+            <div id="groupsList"></div>
+          </div>
+
+          <!-- Настройки -->
+          <div id="settings" class="screen">
+            <h2>Настройки профиля</h2>
+            <div class="create-post">
+              <div class="settings-field">
+                <label>Имя</label>
+                <input type="text" id="settingName">
+              </div>
+              <div class="settings-field">
+                <label>Статус</label>
+                <input type="text" id="settingStatus">
+              </div>
+              <div class="settings-field">
+                <label>Фото профиля</label>
+                <input type="file" id="settingAvatar" accept="image/*">
+              </div>
+              <button onclick="saveSettings()">Сохранить</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Правая колонка -->
+        <div class="right-column">
+          <div style="background:#f0f2f5;padding:10px;margin-bottom:15px;">
+            <div class="chat-title" style="font-weight:bold;color:#333;">Диалоги</div>
+            <div id="quickChats"></div>
+          </div>
+          <div style="background:#f0f2f5;padding:10px;">
+            <div class="chat-title" style="font-weight:bold;color:#333;">Группы</div>
+            <div id="quickGroups"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
